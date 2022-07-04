@@ -1,5 +1,16 @@
 import { randomUUID } from "crypto";
-import { Listener, OnParams } from "../types/keyPress";
+export interface KeyModifiers {
+  ctrl?: boolean;
+  shift?: boolean;
+}
+
+export interface Listener extends KeyModifiers {
+  id: string;
+  key: string;
+  callback: () => Promise<void> | void;
+}
+
+export type OnParams = [string, KeyModifiers, Listener["callback"]] | [string, Listener["callback"]];
 
 export function createKeyPress() {
   let listeners: Listener[] = [];
@@ -11,7 +22,9 @@ export function createKeyPress() {
     }
 
     const listener = listeners.find((listener) => {
-      return listener.key === key.name && listener.ctrl === key.ctrl && listener.shift === key.shift;
+      const query = listener.key === key.name && listener.ctrl === key.ctrl && listener.shift === key.shift;
+      // console.log("[query]", { listener, key }, query);
+      return query;
     });
 
     if (listener) listener.callback();
